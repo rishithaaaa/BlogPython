@@ -12,12 +12,13 @@ from werkzeug.security import generate_password_hash, check_password_hash
 # Import your forms from the forms.py
 from forms import CreatePostForm, CreateRegisterForm, CreateLoginForm, CreateCommentForm
 from flask_gravatar import Gravatar
-import smtplib
+import smtplib, os
 
 # For adding profile images to the comment section
 
 app = Flask(__name__)
-app.config['SECRET_KEY'] = '8BYkEfBA6O6donzWlSihBXox7C0sKR6b'
+app.config['SECRET_KEY'] = os.environ.get('FLASK_KEY')
+
 ckeditor = CKEditor(app)
 Bootstrap5(app)
 
@@ -37,7 +38,8 @@ gravatar = Gravatar(app,
 class Base(DeclarativeBase):
     pass
 
-app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///posts.db?timeout=20'
+app.config['SQLALCHEMY_DATABASE_URI'] =  os.environ.get("DB_URI", "sqlite:///posts.db")
+
 db = SQLAlchemy(model_class=Base)
 db.init_app(app)
 
@@ -267,4 +269,4 @@ def send_email(name, email, phone, message):
 if __name__ == "__main__":
     with app.app_context():
         db.create_all()
-    app.run(debug=True, port=5002)
+    app.run(debug=False)
